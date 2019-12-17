@@ -1,0 +1,7 @@
+.directory
+*.pyc
+*.out
+*.in
+*test*
+*.csv
+*output*
