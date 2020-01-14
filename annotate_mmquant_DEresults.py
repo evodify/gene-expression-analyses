@@ -37,8 +37,8 @@ ENSCAFG00000028653_ENSCAFG00000032286_ENSCAFG00000031239_ENSCAFG00000030588_ENSC
 $ python annotate_mmquant_DEresults.py \
     -i DE_mmg.csv \
     -a annotation.csv \
-    -min mean_pvalues,mean_pvalues_100K \
-    -max mean_pbs,mean_pbs_100K \
+    --min mean_pvalues,mean_pvalues_100K \
+    --max mean_pbs,mean_pbs_100K \
     -o output.csv
 
 # contact:
@@ -141,7 +141,7 @@ def colMinMax(minmax, header, annot):
 output = open(args.output, 'w')
 
 with open(args.annotation) as annotFile:
-    annotHeader = annotFile.readline().split()
+    annotHeader = annotFile.readline().rstrip().split('\t')
 
     annotHeader = headerMinMax('min', annotHeader)
     annotHeader = headerMinMax('max', annotHeader)
@@ -149,7 +149,7 @@ with open(args.annotation) as annotFile:
 
     annotDic = {}
     for line in annotFile:
-        annotWords = line.split()
+        annotWords = line.rstrip().split('\t')
         annotGene = annotWords[0]
         annot = annotWords[1:]
         annotDic[annotGene] = annot
@@ -160,7 +160,7 @@ with open(args.input) as deFile:
     output.write("%s\t%s\n" % (deHeader, annotHeaderP))
 
     for line in deFile:
-        words = line.split()
+        words = line.rstrip().split('\t')
         mmg = words[0]
         genes = mmg.split('_')
         stats = words[1:]
@@ -169,15 +169,16 @@ with open(args.input) as deFile:
             if 'mmgAnnot' in globals():
                 for i in range(len(mmgAnnot)):
                     try:
-                        addAnnot = annotDic[g][i]
+                        addAnnot = annotDic[g][i][:]
                     except:
                         addAnnot = 'NA'
-                    mmgAnnot[i] = mmgAnnot[i] + ";" + addAnnot
+                    mmgAnnot[i] = str(mmgAnnot[i]) + ";" + str(addAnnot)
             else:
                 try:
-                    mmgAnnot = annotDic[g]
+                    mmgAnnot = annotDic[g][:]
                 except:
                     mmgAnnot = ['NA']*len(annot)
+            # print(genes, g, mmgAnnot[0])
 
         mmgAnnot = colMinMax('min', annotHeader, mmgAnnot)
         mmgAnnot = colMinMax('max', annotHeader, mmgAnnot)
