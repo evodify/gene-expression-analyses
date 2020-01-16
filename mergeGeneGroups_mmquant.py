@@ -14,9 +14,6 @@ gene05	1	2
 gene07	10	20
 gene08	10	20
 gene09	10	20
-gene00	10	20
-gene01	10	20
-gene02	10	20
 gene04	10	20
 gene04_gene41_gene06_gene48_gene43_gene31_gene68	1	2
 gene04_gene41_gene48_gene43_gene68	1	2
@@ -41,17 +38,17 @@ gene53_gene86_gene39_gene88_gene84	10	20
 gene53_gene86_gene39_gene84	10	20
 
 
-
 # output mmquant.out:
 
 gene	sample1	sample2
+gene00	1	2
+gene02	1	2
+gene05	1	2
 gene07	10	20
 gene08	10	20
 gene09	10	20
-gene00	10	20
-gene01	10	20
-gene02	10	20
 gene04	10	20
+gene05	0	0
 gene41	10	20
 gene53	10	20
 gene04_gene48_gene43_gene68_gene44	10	20
@@ -59,7 +56,7 @@ gene53_gene86_gene39_gene88_gene84	62	160
 
 # command:
 
-$ python mergegGroups_mmquant.py -i mmquant.in -o mmquant.out -l 2 -c 10
+python mergeGeneGroups_mmquant.py -i mmquant.in -o mmquant.out -l 2 -c 10
 
 # contact:
 
@@ -73,7 +70,6 @@ import argparse, sys  # for input options
 import collections
 
 ############################# options #############################
-
 
 class CommandLineParser(argparse.ArgumentParser):
     def error(self, message):
@@ -157,12 +153,13 @@ with open(args.input) as datafile:
         genes = words[0]
         counts = list(map(int, words[1:]))
         genesNumber = len(genes.split('_'))
-        if sum(counts) >= args.count:
+        if ('_' in genes and sum(counts) >= args.count) or '_' not in genes:
             if genesNumber >= args.length:
                 exprDic[genes] = counts
             else:
                 countsP = list2print(counts)
                 output.write("%s\t%s\n" % (genes, countsP))
+
     exprDicMerged = mergeMMG(exprDic)
     for key, values in exprDicMerged.items():
         valuesP = list2print(values)
